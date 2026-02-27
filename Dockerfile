@@ -1,10 +1,24 @@
 # Build stage
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
+
+# Copy Maven wrapper and pom first
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline
+
+# Copy source and list files for debugging
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN echo "--- VERIFYING SOURCE FILES ---" && find src -name "*.java"
+
+# Build the application
+RUN ./mvnw clean package -DskipTests
+
+# Verify built classes
+RUN echo "--- VERIFYING BUILT CLASSES ---" && find target/classes -name "*.class"
 
 # Run stage
 FROM eclipse-temurin:21-jre-alpine
