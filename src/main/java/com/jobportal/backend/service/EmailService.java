@@ -82,7 +82,11 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        helper.setFrom(fromEmail, "JobMitra — Career Platform");
+        try {
+            helper.setFrom(fromEmail, "JobMitra - Career Platform");
+        } catch (java.io.UnsupportedEncodingException e) {
+            helper.setFrom(fromEmail);
+        }
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlBody, true); // true = isHtml
@@ -96,18 +100,18 @@ public class EmailService {
         System.out.println("[EmailService] Email sent to " + to + " | Subject: " + subject);
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // -----------------------------------------------------------------
     //  SUBJECT BUILDERS
-    // ─────────────────────────────────────────────────────────────────
+    // -----------------------------------------------------------------
 
     private String buildAcceptanceSubject(Job job) {
-        return "🎉 Congratulations! Your Application for "" + safe(job.getTitle())
-                + "" at " + safe(job.getCompany()) + " has been Accepted — JobMitra";
+        return "Congratulations! Your Application for '" + safe(job.getTitle())
+                + "' at " + safe(job.getCompany()) + " has been Accepted - JobMitra";
     }
 
     private String buildRejectionSubject(Job job) {
         return "Application Update: " + safe(job.getTitle())
-                + " at " + safe(job.getCompany()) + " — JobMitra";
+                + " at " + safe(job.getCompany()) + " - JobMitra";
     }
 
     // ─────────────────────────────────────────────────────────────────
