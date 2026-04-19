@@ -11,6 +11,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
     // We don't make this a @Bean to avoid Spring Boot automatically registering it
     // twice
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -51,6 +57,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/profile/**").authenticated()
                         .requestMatchers("/api/recruiter/stats/**").hasRole("RECRUITER")
                         .anyRequest().authenticated())
+
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
 
                 .addFilterBefore(
                         new JwtAuthenticationFilter(),
