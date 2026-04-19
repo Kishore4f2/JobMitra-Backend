@@ -55,6 +55,15 @@ public class ApplicationRepository {
         return jdbcTemplate.update(sql, status, id);
     }
 
+    public Application findById(int id) {
+        String sql = "SELECT a.*, j.title as job_title FROM applications a LEFT JOIN jobs j ON a.job_id = j.id WHERE a.id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     public List<Application> findAll() {
         String sql = "SELECT a.*, j.title as job_title FROM applications a LEFT JOIN jobs j ON a.job_id = j.id ORDER BY a.applied_at DESC";
         return jdbcTemplate.query(sql, rowMapper);
